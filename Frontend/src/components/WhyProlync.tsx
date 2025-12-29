@@ -64,7 +64,7 @@ const WhyProlync = () => {
     const Icon = activeBlock.icon;
 
     return (
-        <section className="py-16 bg-white relative overflow-hidden">
+        <section className="py-12 bg-white relative overflow-hidden">
             {/* Background Glow */}
             <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br transition-all duration-1000 blur-[120px] opacity-20 pointer-events-none rounded-full ${activeBlock.gradient}`} />
 
@@ -72,7 +72,7 @@ const WhyProlync = () => {
                 <div className="lg:grid lg:grid-cols-[1fr_1.5fr] lg:gap-24 items-center">
 
                     {/* Left Side: Content */}
-                    <div className="max-w-xl mb-16 lg:mb-0">
+                    <div className="max-w-xl mb-10 lg:mb-0">
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ const WhyProlync = () => {
                                             ))}
                                         </div>
 
-                                        <p className="text-xl md:text-3xl text-slate-800 leading-relaxed font-medium italic">
+                                        <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
                                             "{activeBlock.description}"
                                         </p>
 
@@ -156,7 +156,7 @@ const WhyProlync = () => {
                                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${activeBlock.iconBg} ${activeBlock.iconColor}`}>
                                                 <Icon className="w-5 h-5" />
                                             </div>
-                                            <span className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
+                                            <span className="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
                                                 Prolync
                                             </span>
                                         </div>

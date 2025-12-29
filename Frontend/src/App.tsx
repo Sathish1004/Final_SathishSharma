@@ -37,6 +37,7 @@ const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 const Support = lazy(() => import('./pages/Support'));
 const ContactSupport = lazy(() => import('./pages/ContactSupport'));
+const FeatureDetail = lazy(() => import('./pages/FeatureDetail'));
 
 // Layout
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -74,6 +75,7 @@ const App = () => (
                 {/* Public routes with Global Navbar */}
                 <Route element={<PublicLayout />}>
                   <Route path="/" element={<Index />} />
+                  <Route path="/feature/:featureId" element={<FeatureDetail />} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/blog" element={<Blog />} />

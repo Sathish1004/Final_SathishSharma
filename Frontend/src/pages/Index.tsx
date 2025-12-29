@@ -57,14 +57,14 @@ export default function Index() {
         <SaaSBackground />
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-24 pb-32 sm:pb-40 lg:pt-40 lg:pb-32">
+        <section className="relative overflow-hidden pt-20 pb-16 sm:pb-20 lg:pt-24 lg:pb-20">
           {/* Background - Clean gradient REMOVED for SaaS Background */}
 
           <div className="max-w-[1700px] mx-auto px-4 md:px-8">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
               {/* Left Content */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-1 max-w-2xl lg:max-w-none mx-auto lg:mx-0 mt-0 lg:mt-16">
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-1 max-w-2xl lg:max-w-none mx-auto lg:mx-0 mt-0 lg:mt-4">
 
                 <h1 className="text-4xl md:text-5xl lg:text-[4.5rem] font-bold tracking-tight text-slate-900 mb-4 md:mb-6 leading-[1.15] lg:leading-[1.1] drop-shadow-sm flex flex-col gap-1 md:gap-2">
                   <span className="block">Scale Your Learning.</span>
@@ -141,7 +141,7 @@ export default function Index() {
 
       {/* CTA Section */}
       {/* Animated Text Banner (Above Footer) */}
-      <section className="py-20 bg-[#020617] relative overflow-hidden flex items-center justify-center border-t border-slate-800/50">
+      <section className="py-12 bg-[#020617] relative overflow-hidden flex items-center justify-center border-t border-slate-800/50">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20" />
 
         <div className="w-full relative z-10 px-4 md:px-8 flex justify-center">

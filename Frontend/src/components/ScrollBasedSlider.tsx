@@ -1,118 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Users, Layout, CheckCircle2, Code, Briefcase, Trophy, ArrowRight, ChevronRight } from 'lucide-react';
-
-const slides = [
-    {
-        id: 'courses',
-        shortTitle: "Courses",
-        icon: BookOpen,
-        title: "100+ Industry-Ready Courses",
-        highlight: "Learn once. Apply everywhere.",
-        description: [
-            "Professionally structured courses designed by industry experts",
-            "Video-based learning with real-world examples",
-            "Certifications aligned with job requirements",
-            "Beginner to advanced learning paths"
-        ],
-        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop",
-        color: "text-blue-600",
-        bg: "bg-blue-50",
-        overlay: "Master New Skills"
-    },
-    {
-        id: 'coding',
-        shortTitle: "Coding",
-        icon: Code,
-        title: "Interactive Coding Platform",
-        highlight: "Practice coding without leaving your browser.",
-        description: [
-            "Built-in code editor supports 10+ languages",
-            "Real-time output and error debugging",
-            "Daily coding challenges and contests",
-            "Project-based learning approach"
-        ],
-        image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2669&auto=format&fit=crop",
-        color: "text-purple-600",
-        bg: "bg-purple-50",
-        overlay: "Build & Deploy"
-    },
-    {
-        id: 'mentorship',
-        shortTitle: "Mentorship",
-        icon: Users,
-        title: "50+ Expert Mentors",
-        highlight: "Learn directly from people who work in the industry.",
-        description: [
-            "One-on-one mentorship sessions",
-            "Guidance from working professionals",
-            "Career planning, resume review, and mock interviews",
-            "Personalized learning support"
-        ],
-        image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2684&auto=format&fit=crop",
-        color: "text-emerald-600",
-        bg: "bg-emerald-50",
-        overlay: "Get Expert Guidance"
-    },
-    {
-        id: 'jobs',
-        shortTitle: "Jobs",
-        icon: Briefcase,
-        title: "Jobs & Internships",
-        highlight: "Connecting talent with top opportunities.",
-        description: [
-            "Exclusive internship listings for students",
-            "Full-time job opportunities for freshers",
-            "Direct application to partner companies",
-            "Resume building and portfolio showcasing"
-        ],
-        image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=2672&auto=format&fit=crop",
-        color: "text-orange-600",
-        bg: "bg-orange-50",
-        overlay: "Land Your Dream Job"
-    },
-    {
-        id: 'placement',
-        shortTitle: "Placement",
-        icon: Trophy,
-        title: "Placement Support",
-        highlight: "Your bridge from campus to corporate.",
-        description: [
-            "Dedicated placement cell assistance",
-            "Mock aptitude tests and technical interviews",
-            "Soft skills and communication training",
-            "Guaranteed interview opportunities for top performers"
-        ],
-        image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
-        color: "text-amber-600",
-        bg: "bg-amber-50",
-        overlay: "Achieve Success"
-    },
-    {
-        id: 'workspace',
-        shortTitle: "Workspace",
-        icon: Layout,
-        title: "One Unified Student Workspace",
-        highlight: "Everything you need — in one workspace.",
-        description: [
-            "Single login for courses, coding practice, mentorship, and jobs",
-            "Track learning progress and achievements in one dashboard",
-            "Seamless transition from learning → practice → placement",
-            "Built for students, freshers, and career switchers"
-        ],
-        image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2670&auto=format&fit=crop",
-        color: "text-indigo-600",
-        bg: "bg-indigo-50",
-        overlay: "All-in-One Platform"
-    }
-];
+import { CheckCircle2 } from 'lucide-react';
+import { features } from '@/data/featuresData';
+import { useNavigate } from 'react-router-dom';
 
 export default function ScrollBasedSlider() {
     const [activeTab, setActiveTab] = useState(0);
+    const navigate = useNavigate();
+    const slides = features;
 
     return (
 
-        <section id="why-choose-workspace" className="py-16 md:py-24 bg-[#022c22] overflow-hidden relative">
+        <section id="why-choose-workspace" className="py-12 md:py-16 bg-[#022c22] overflow-hidden relative">
             {/* Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px]" />
@@ -122,7 +21,7 @@ export default function ScrollBasedSlider() {
             <div className="container mx-auto px-4 max-w-7xl relative z-10">
 
                 {/* Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-8">
                     <h2 className="text-3xl md:text-5xl font-serif text-white mb-8 tracking-tight">
                         Why Choose Student Workspace?
                     </h2>
@@ -135,8 +34,8 @@ export default function ScrollBasedSlider() {
                                 onClick={() => setActiveTab(index)}
                                 className={`pb-4 text-base md:text-lg font-medium transition-all duration-300 relative
                                 ${activeTab === index
-                                        ? 'text-white shadow-[0_4px_20px_-2px_rgba(16,185,129,0.5)]' // Added subtle glow to text
-                                        : 'text-slate-500 hover:text-slate-300'
+                                        ? 'text-white'
+                                        : 'text-slate-500 hover:text-white'
                                     }
                             `}
                             >
@@ -179,7 +78,10 @@ export default function ScrollBasedSlider() {
                                         <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-tight">
                                             {slides[activeTab].overlay} made simple.
                                         </h3>
-                                        <button className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors">
+                                        <button
+                                            onClick={() => navigate(`/feature/${slides[activeTab].id}`)}
+                                            className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors"
+                                        >
                                             Read full story
                                         </button>
                                     </div>

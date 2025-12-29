@@ -63,7 +63,7 @@ export default function WorkspaceStack() {
     }, [isPaused]);
 
     return (
-        <section className="py-16 md:py-20 bg-white relative">
+        <section className="py-10 md:py-16 bg-white relative">
             <div className="container mx-auto px-4 md:px-6 relative">
 
                 {/* Small Blue Floating Box (Height Reduced 30%) */}

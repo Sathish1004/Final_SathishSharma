@@ -146,7 +146,7 @@ const MOTION_SPAN = motion.span;
 
 export default function FeaturesRow() {
     return (
-        <section className="relative py-32 bg-slate-50 overflow-hidden">
+        <section className="relative py-16 bg-slate-50 overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
             <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-100/40 rounded-full blur-[100px] pointer-events-none" />
@@ -154,7 +154,7 @@ export default function FeaturesRow() {
 
             <div className="container mx-auto px-6 relative z-10">
                 {/* Section Header */}
-                <div className="text-center mb-20 max-w-3xl mx-auto">
+                <div className="text-center mb-12 max-w-3xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}

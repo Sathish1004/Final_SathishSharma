@@ -198,7 +198,7 @@ const SlidingToolsSection = () => {
     ));
 
     return (
-        <section className="relative py-10 md:py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-indigo-50/30">
+        <section className="relative py-10 md:py-16 overflow-hidden bg-gradient-to-b from-gray-50 via-white to-indigo-50/30">
             {/* Enhanced Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
                 {/* Animated Gradient Orbs */}
@@ -278,7 +278,7 @@ const SlidingToolsSection = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, type: "spring" }}
-                    className="text-center mb-16"
+                    className="text-center mb-10"
                 >
                     <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-white/70 shadow-lg shadow-gray-200/30 mb-8 hover:shadow-xl hover:shadow-indigo-200/30 transition-all duration-500 group">
                         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 animate-pulse group-hover:scale-150 transition-transform duration-300"></div>
@@ -315,10 +315,9 @@ const SlidingToolsSection = () => {
 
                 {/* Active Communities Section */}
                 <motion.div
-                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    className="mb-20"
+                    className="mb-12"
                 >
 
 
