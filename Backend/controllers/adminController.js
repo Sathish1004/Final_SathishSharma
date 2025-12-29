@@ -10,7 +10,7 @@ export const getAllUsers = async (req, res) => {
         const offset = (page - 1) * limit;
 
         let query = `
-            SELECT id, name, email, role, 
+            SELECT id, name, email, role, profile_picture,
             CASE 
                 WHEN created_at < DATE_SUB(NOW(), INTERVAL 180 DAY) THEN 'Expired'
                 ELSE status 
@@ -198,7 +198,7 @@ export const getUserDetails = async (req, res) => {
 
         // 1. Fetch Basic User Profile
         const [userResult] = await db.query(
-            'SELECT id, name, email, role, status, created_at, last_login FROM users WHERE id = ?',
+            'SELECT id, name, email, role, status, created_at, last_login, profile_picture, resume_path FROM users WHERE id = ?',
             [id]
         );
 

@@ -10,8 +10,10 @@ import {
     Heart,
     CheckCircle2
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Footer = () => {
+    const { user } = useAuth();
     return (
         <footer className="bg-gradient-to-br from-[#020617] via-[#0b1221] to-[#020617] text-slate-300 border-t border-white/5 relative overflow-hidden">
             {/* Background Effects */}
@@ -22,25 +24,24 @@ const Footer = () => {
             <div className="max-w-[1700px] mx-auto px-6 pt-16 pb-10 md:pt-24 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
-                    {/* Left Section: Logo & Brand Information */}
-                    <div className="lg:col-span-4 space-y-8">
-                        <div className="inline-flex items-center justify-center bg-white rounded-2xl p-2.5 md:p-3 shadow-2xl shadow-black/40 border border-white/10 mb-2">
+                    <div className="lg:col-span-4 space-y-4">
+                        <div className="inline-flex items-center justify-center bg-white rounded-xl p-1 md:p-1.5 shadow-2xl shadow-black/40 border border-white/10">
                             <img
                                 src="/prolync_logo.png"
                                 alt="Prolync Logo"
-                                className="h-10 md:h-8 w-auto object-contain"
+                                className="h-8 md:h-7 w-auto object-contain"
                                 onError={(e) => {
                                     (e.target as HTMLImageElement).src = "/logo.png"; // Fallback
                                 }}
                             />
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3 pt-2">
                             <p className="text-slate-100 font-medium text-lg leading-relaxed max-w-sm">
                                 Building the next-generation workspace for education.
                             </p>
                             <p className="text-slate-400 text-base leading-relaxed max-w-sm">
-                                Connecting students, colleges, and universities in one unified digital ecosystem.
+                                Connecting students, colleges, and universities in one unified digital ecosystem. We bridge the gap between academia and industry through AI-driven learning and real-world career opportunities.
                             </p>
                         </div>
                     </div>
@@ -52,23 +53,30 @@ const Footer = () => {
                             <span className="h-[2px] w-12 bg-blue-500/50 rounded-full"></span>
                         </h3>
                         <ul className="grid gap-4">
-                            {[
-                                { label: "Prolync Workspace Dashboard", href: "#" },
-                                { label: "Courses & Learning Paths", href: "#" },
-                                { label: "Coding Platform", href: "#" },
-                                { label: "Mentorship & 1:1 Sessions", href: "#" },
-                                { label: "Jobs, Internships & Placements", href: "#" },
-                                { label: "Projects & Mini Projects", href: "#" },
-                                { label: "Events & Hackathons", href: "#" },
-                                { label: "Certificates & Skill Badges", href: "#" },
-                                { label: "Student Community", href: "#" },
-                                { label: "Pricing & Upgrade Plans", href: "#" }
-                            ].map((item, i) => (
+                            {(user ? [
+                                { label: "Dashboard", href: "/dashboard" },
+                                { label: "Courses", href: "/courses" },
+                                { label: "Coding Arena", href: "/coding" },
+                                { label: "Mentorship", href: "/mentors" },
+                                { label: "Jobs & Internships", href: "/jobs" },
+                                { label: "Projects", href: "/projects" },
+                                { label: "Events", href: "/events" },
+                                { label: "Certifications", href: "/dashboard" }, // Fallback to dashboard for now
+                                { label: "Community", href: "/dashboard" },
+                                { label: "Pricing", href: "/pricing" }
+                            ] : [
+                                { label: "Home", href: "/" },
+                                { label: "Why Prolync?", href: "/#why-choose-workspace" },
+                                { label: "Pricing", href: "/pricing" },
+                                { label: "About Us", href: "/about-prolync" },
+                                { label: "Contact", href: "/contact" },
+                                { label: "Login / Register", href: "/login" }
+                            ]).map((item, i) => (
                                 <li key={i}>
-                                    <a href={item.href} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-all duration-300">
+                                    <Link to={item.href} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-all duration-300">
                                         <ArrowRight className="w-3.5 h-3.5 text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                         <span className="text-[15px]">{item.label}</span>
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -153,14 +161,14 @@ const Footer = () => {
 
                 </div>
 
-                {/* Bottom Bar: Copyright */}
-                <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500">
-                    <p className="text-center md:text-left">
-                        © 2025 <span className="text-slate-400 font-semibold px-1">Prolyncinfotech Private Limited</span>. All rights reserved.
+                {/* Bottom Section: Copyright & Legal */}
+                <div className="border-t border-slate-800/60 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+                    <p>
+                        &copy; 2025 <span className="text-slate-400 font-medium">Prolync Infotech Pvt Limited</span>. All rights reserved.
                     </p>
-                    <div className="flex gap-8">
-                        <Link to="/privacy-policy" className="hover:text-blue-400 transition-colors">Privacy Policy</Link>
-                        <Link to="/terms-of-use" className="hover:text-blue-400 transition-colors">Terms of Service</Link>
+                    <div className="flex items-center gap-6">
+                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
                         <a href="#" className="hover:text-blue-400 transition-colors">Cookies</a>
                     </div>
                 </div>

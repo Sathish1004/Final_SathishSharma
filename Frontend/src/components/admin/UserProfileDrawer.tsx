@@ -88,6 +88,8 @@ interface UserProfileDrawerProps {
     onUserUpdated: () => void;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function UserProfileDrawer({ user, isOpen, onClose, onUserUpdated }: UserProfileDrawerProps) {
     const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(false); // For actions
@@ -121,7 +123,7 @@ export default function UserProfileDrawer({ user, isOpen, onClose, onUserUpdated
         setFetching(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+            const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.ok) {
@@ -190,8 +192,8 @@ export default function UserProfileDrawer({ user, isOpen, onClose, onUserUpdated
 
                     <div className="flex items-start gap-5">
                         <Avatar className="h-20 w-20 border-4 border-slate-700/50 shadow-xl">
-                            <AvatarImage src={user.profile_picture ? `http://localhost:5000${user.profile_picture}` : `https://ui-avatars.com/api/?name=${user.name}&background=6366f1&color=fff`} />
-                            <AvatarFallback className="text-2xl font-bold bg-indigo-600 text-white">{user.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={(profile?.profile_picture || user.profile_picture) ? `${API_URL}${(profile?.profile_picture || user.profile_picture)}` : `https://ui-avatars.com/api/?name=${(profile?.name || user.name)}&background=6366f1&color=fff`} />
+                            <AvatarFallback className="text-2xl font-bold bg-indigo-600 text-white">{(profile?.name || user.name).charAt(0)}</AvatarFallback>
                         </Avatar>
 
                         <div className="space-y-1 mt-1">
@@ -267,8 +269,8 @@ export default function UserProfileDrawer({ user, isOpen, onClose, onUserUpdated
                                                 {profile?.resume_path && (
                                                     <div className="flex justify-between py-1 border-b border-slate-50">
                                                         <span className="text-slate-500">Resume</span>
-                                                        <a href={`http://localhost:5000${profile.resume_path}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs flex items-center">
-                                                            View Resume <ExternalLink className="h-3 w-3 ml-1" />
+                                                        <a href={`${API_URL}${profile.resume_path}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs flex items-center">
+                                                            View Resume PDF <ExternalLink className="h-3 w-3 ml-1" />
                                                         </a>
                                                     </div>
                                                 )}

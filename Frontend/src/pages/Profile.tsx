@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User, FileText, Lock, Upload, Loader2, Camera, Shield, Mail, Phone, BookOpen } from "lucide-react";
 
 export default function Profile() {
-    const { user, signIn } = useAuth(); // Re-using signIn to update context if needed, or we might need a refreshUser function in context
+    const { user, refreshUser } = useAuth(); // Re-using signIn to update context if needed, or we might need a refreshUser function in context
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ export default function Profile() {
             if (!res.ok) throw new Error("Failed to update profile");
 
             toast({ title: "Success", description: "Profile updated successfully." });
-            // Ideally trigger a context refresh here
+            await refreshUser();
         } catch (error) {
             toast({ title: "Error", description: "Failed to update profile.", variant: "destructive" });
         } finally {
@@ -76,10 +76,8 @@ export default function Profile() {
 
             if (!res.ok) throw new Error("Failed to upload avatar");
 
-            const data = await res.json();
             toast({ title: "Success", description: "Profile picture updated." });
-            // Reload page to see changes (simple way) or update context
-            window.location.reload();
+            await refreshUser();
         } catch (error) {
             toast({ title: "Error", description: "Failed to upload avatar.", variant: "destructive" });
         }
@@ -103,7 +101,7 @@ export default function Profile() {
             if (!res.ok) throw new Error("Failed to upload resume");
 
             toast({ title: "Success", description: "Resume uploaded successfully." });
-            window.location.reload();
+            await refreshUser();
         } catch (error) {
             toast({ title: "Error", description: "Failed to upload resume.", variant: "destructive" });
         }

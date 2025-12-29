@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, User, Menu, X, LogOut, Settings, User as UserIcon, Bell } from 'lucide-react';
+import { ChevronDown, User, Menu, X, LogOut, Settings, User as UserIcon, Bell, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -107,37 +107,53 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                             </div>
                         ) : (
                             // LOGGED IN USER STATE - DROPDOWN
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200 cursor-pointer hover:shadow-md transition-all">
-                                        <span className="text-blue-700 font-bold text-sm">
-                                            {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                                        </span>
-                                    </div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white rounded-xl shadow-xl border border-slate-100 p-2">
-                                    <DropdownMenuLabel className="font-normal">
-                                        <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none text-slate-900">{user.name}</p>
-                                            <p className="text-xs leading-none text-slate-500">{user.email}</p>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-slate-100 my-2" />
-                                    <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-slate-50 focus:bg-slate-50 text-slate-700" onClick={() => navigate('/profile')}>
-                                        <UserIcon className="mr-2 h-4 w-4" />
-                                        <span>My Profile</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-slate-50 focus:bg-slate-50 text-slate-700" onClick={() => navigate('/settings')}>
-                                        <Settings className="mr-2 h-4 w-4" />
-                                        <span>Settings</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="bg-slate-100 my-2" />
-                                    <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-red-50 focus:bg-red-50 text-red-600 focus:text-red-700" onClick={handleSignOut}>
-                                        <LogOut className="mr-2 h-4 w-4" />
-                                        <span>Sign Out</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    className="hidden lg:flex items-center gap-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                                    onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/dashboard')}
+                                >
+                                    <span className="font-medium">Dashboard</span>
+                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Avatar className="h-10 w-10 border border-blue-200 cursor-pointer hover:shadow-md transition-all">
+                                            <AvatarImage src={user.profile_picture ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.profile_picture}` : undefined} />
+                                            <AvatarFallback className="bg-blue-100 text-blue-700 font-bold text-sm">
+                                                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56 bg-white rounded-xl shadow-xl border border-slate-100 p-2">
+                                        <DropdownMenuLabel className="font-normal">
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-sm font-medium leading-none text-slate-900">{user.name}</p>
+                                                <p className="text-xs leading-none text-slate-500">{user.email}</p>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator className="bg-slate-100 my-2" />
+                                        <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-slate-50 focus:bg-slate-50 text-slate-700" onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/dashboard')}>
+                                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                                            <span>Dashboard</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-slate-50 focus:bg-slate-50 text-slate-700" onClick={() => navigate('/profile')}>
+                                            <UserIcon className="mr-2 h-4 w-4" />
+                                            <span>My Profile</span>
+                                        </DropdownMenuItem>
+                                        {!user.role || user.role !== 'ADMIN' ? (
+                                            <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-slate-50 focus:bg-slate-50 text-slate-700" onClick={() => navigate('/settings')}>
+                                                <Settings className="mr-2 h-4 w-4" />
+                                                <span>Settings</span>
+                                            </DropdownMenuItem>
+                                        ) : null}
+                                        <DropdownMenuSeparator className="bg-slate-100 my-2" />
+                                        <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-red-50 focus:bg-red-50 text-red-600 focus:text-red-700" onClick={handleSignOut}>
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            <span>Sign Out</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
                         )}
                     </div>
 
@@ -195,9 +211,12 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                     ) : (
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-3 px-2 py-2 bg-slate-50 rounded-lg">
-                                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200">
-                                    <span className="text-blue-700 font-bold text-xs">{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
-                                </div>
+                                <Avatar className="h-8 w-8 border border-blue-200">
+                                    <AvatarImage src={user.profile_picture ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.profile_picture}` : undefined} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-700 font-bold text-xs">
+                                        {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
                                 <div className="flex flex-col">
                                     <span className="text-sm font-medium text-slate-900">{user.name}</span>
                                     <span className="text-xs text-slate-500">{user.email}</span>

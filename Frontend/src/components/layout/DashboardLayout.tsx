@@ -42,7 +42,8 @@ import {
   Settings,
   Bell,
   ChevronRight,
-  Loader2
+  Loader2,
+  Home
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
@@ -63,16 +64,11 @@ const navItems = [
 ];
 
 function AppSidebar() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -130,43 +126,15 @@ function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start gap-3 px-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.profile_picture ? `http://localhost:5000${user.profile_picture}` : undefined} />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user?.name?.charAt(0).toUpperCase() || 'G'}
-                </AvatarFallback>
-              </Avatar>
-              {!isCollapsed && (
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-sm font-medium truncate max-w-[140px]">
-                    {user?.name || 'Guest User'}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{user?.email || 'View Only'}</span>
-                </div>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/profile')}>
-              <Users className="mr-2 h-4 w-4" />
-              My Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SidebarMenuButton asChild tooltip="Home Page">
+          <NavLink
+            to="/"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all text-sidebar-foreground/70 hover:text-sidebar-foreground"
+          >
+            <Home className="h-5 w-5" />
+            {!isCollapsed && <span>Home Page</span>}
+          </NavLink>
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );
@@ -175,15 +143,13 @@ function AppSidebar() {
 
 
 export default function DashboardLayout() {
-  const { user, loading, showOnboarding } = useAuth();
+  const { user, loading, showOnboarding, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // Removed auth guard for public access
-  // useEffect(() => {
-  //   if (!loading && !user) {
-  //     navigate('/auth');
-  //   }
-  // }, [user, loading, navigate]);
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   if (loading) {
     return (
@@ -192,11 +158,6 @@ export default function DashboardLayout() {
       </div>
     );
   }
-
-  // Allow access even without user
-  // if (!user) {
-  //   return null;
-  // }
 
   return (
     <SidebarProvider>
@@ -208,7 +169,47 @@ export default function DashboardLayout() {
           <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center px-4 gap-4">
             <SidebarTrigger />
             <div className="flex-1" />
-            <NotificationCenter />
+
+            <div className="flex items-center gap-4">
+              <NotificationCenter />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full border border-border/50 hover:bg-accent">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.profile_picture ? `http://localhost:5000${user.profile_picture}` : undefined} alt={user?.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </header>
 
           {/* Page content */}

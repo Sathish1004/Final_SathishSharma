@@ -28,7 +28,8 @@ export default function Index() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard');
+      // Allow logged-in users to view homepage
+      // navigate('/dashboard'); 
     }
     // Check for openAuth state from other pages
     if (location.state?.openAuth) {
@@ -57,7 +58,7 @@ export default function Index() {
         <SaaSBackground />
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-16 sm:pb-20 lg:pt-24 lg:pb-20">
+        <section className="relative overflow-hidden pt-20 pb-6 sm:pb-8 lg:pt-24 lg:pb-10">
           {/* Background - Clean gradient REMOVED for SaaS Background */}
 
           <div className="max-w-[1700px] mx-auto px-4 md:px-8">

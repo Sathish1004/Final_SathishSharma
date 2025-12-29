@@ -22,6 +22,7 @@ interface AuthContextType {
   signOut: () => void;
   showOnboarding: boolean;
   setShowOnboarding: (value: boolean) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -191,6 +192,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error("Failed to refresh user", error);
+    }
+  };
+
   const signOut = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -201,7 +218,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, sendOtp, verifyAdminLogin, showOnboarding, setShowOnboarding }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, sendOtp, verifyAdminLogin, showOnboarding, setShowOnboarding, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

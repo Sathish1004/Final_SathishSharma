@@ -14,10 +14,8 @@ export default function PublicLayout() {
     useEffect(() => {
         // Redirect to dashboard if already logged in AND not in onboarding
         if (!loading && user && !showOnboarding) {
-            // Only redirect if we are on a purely public page that shouldn't be accessed by logged in users?
-            // Actually, typically homepage is accessible, but maybe 'Login' button changes to 'Dashboard'.
-            // For now, retaining existing logic from Index.tsx:
-            if (location.pathname === '/' || location.pathname === '/login') {
+            // Only redirect if we are purely on /login page, but allow home /
+            if (location.pathname === '/login') {
                 navigate('/dashboard');
             }
         }

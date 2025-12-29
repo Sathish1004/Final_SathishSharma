@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, getMe, verifyAdminOtp, forgotPassword, resetPassword } from '../controllers/authController.js';
+import { login, getMe, verifyAdminOtp, forgotPassword, resetPassword, changePassword } from '../controllers/authController.js';
 import { sendOtp, registerWithOtp } from '../controllers/OtpController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -12,5 +12,6 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.post('/verify-admin-otp', verifyAdminOtp);
 router.get('/me', protect, getMe);
+router.put('/change-password', protect, changePassword);
 
 export default router;

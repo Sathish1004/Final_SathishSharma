@@ -32,8 +32,11 @@ import {
     DollarSign,
     Briefcase as BriefcaseIcon,
     ExternalLink,
-    Trash2
+    Trash2,
+    Home,
+    Phone
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     Card,
     CardContent,
@@ -98,6 +101,7 @@ import UserManagement from "./UserManagement";
 import CourseManagement from "./CourseManagement";
 import DashboardOverview from "@/components/admin/DashboardOverview";
 import FeatureManagement from "@/components/admin/FeatureManagement";
+import SettingsManagement from "@/components/admin/SettingsManagement";
 import CodingOverview from '@/components/admin/module-overviews/CodingOverview';
 import MentorshipOverview from '@/components/admin/module-overviews/MentorshipOverview';
 import CoursesOverview from '@/components/admin/module-overviews/CoursesOverview';
@@ -235,7 +239,7 @@ const JOB_APPLICATIONS = [
 ];
 
 export default function AdminDashboard() {
-    const { signOut } = useAuth();
+    const { signOut, user } = useAuth();
     const navigate = useNavigate();
     const [activeModule, setActiveModule] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -252,6 +256,7 @@ export default function AdminDashboard() {
         { id: 'events', label: 'Events', icon: Calendar },
         { id: 'news', label: 'News & Updates', icon: Newspaper },
         { id: 'feedback', label: 'Feedback', icon: MessageSquare },
+        { id: 'settings', label: 'Settings', icon: Settings },
     ];
 
     // Helper to render content based on active module
@@ -280,6 +285,8 @@ export default function AdminDashboard() {
                 return <FeatureManagement />;
             case 'feedback':
                 return <FeedbackManagement />;
+            case 'settings':
+                return <SettingsManagement />;
             default:
                 return <DashboardOverview />;
         }
@@ -326,13 +333,6 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="p-4 border-t border-slate-800">
-                    <button
-                        onClick={() => { signOut(); navigate('/login'); }}
-                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-red-400 hover:bg-slate-800 hover:text-red-300 transition-colors ${!isSidebarOpen && 'justify-center'}`}
-                    >
-                        <LogOut className="h-5 w-5" />
-                        {isSidebarOpen && <span className="font-medium text-sm">Sign Out</span>}
-                    </button>
                 </div>
             </aside>
 
@@ -344,12 +344,45 @@ export default function AdminDashboard() {
                         {sidebarItems.find(i => i.id === activeModule)?.label}
                     </h1>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-slate-600">Admin User</span>
-                            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
-                                A
-                            </div>
-                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-slate-100 p-0">
+                                    <Avatar className="h-9 w-9 border border-blue-200 cursor-pointer">
+                                        <AvatarImage src={user?.profile_picture ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.profile_picture}` : undefined} />
+                                        <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">
+                                            {user?.name?.charAt(0).toUpperCase() || 'A'}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64 p-2">
+                                <DropdownMenuLabel className="font-normal mb-2">
+                                    <div className="flex flex-col space-y-3 bg-slate-50 p-3 rounded-lg">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-semibold leading-none text-slate-900">{user?.name || 'Admin User'}</p>
+                                            <p className="text-xs text-slate-500">{user?.email || 'admin@example.com'}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs text-slate-600">
+                                            <Phone className="h-3 w-3" />
+                                            <span>{user?.phone_number || '+91 98765 43210'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="secondary" className="text-[10px] bg-blue-100 text-blue-700 hover:bg-blue-100">
+                                                {user?.role || 'ADMINISTRATOR'}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 py-2.5 mt-1"
+                                    onClick={() => { signOut(); navigate('/login'); }}
+                                >
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Sign Out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </header>
 

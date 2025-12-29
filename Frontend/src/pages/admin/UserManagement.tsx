@@ -30,7 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import UserProfileDrawer from "@/components/admin/UserProfileDrawer";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface User {
@@ -43,6 +43,8 @@ interface User {
     created_at: string;
     last_login?: string;
     progress: number;
+    profile_picture?: string;
+    resume_path?: string;
 }
 
 export default function UserManagement() {
@@ -362,6 +364,7 @@ export default function UserManagement() {
                                     <TableCell>
                                         <div className="flex items-center gap-3">
                                             <Avatar className="h-9 w-9 border border-slate-200">
+                                                <AvatarImage src={user.profile_picture ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.profile_picture}` : undefined} />
                                                 <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">
                                                     {user.name.charAt(0).toUpperCase()}
                                                 </AvatarFallback>

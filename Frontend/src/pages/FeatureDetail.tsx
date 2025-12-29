@@ -45,23 +45,28 @@ const FeatureDetail = () => {
                         <div className="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-sm rounded-xl mb-6 ring-1 ring-white/20">
                             <Icon className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight leading-tight max-w-4xl mx-auto">
+                        {/* Reduced font size as requested */}
+                        <h1 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight leading-tight max-w-4xl mx-auto">
                             {feature.heroTitle}
                         </h1>
-                        <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-10 font-medium leading-relaxed">
+                        <p className="text-sm md:text-base text-blue-100 max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
                             {feature.heroDescription}
                         </p>
 
                         <div className="flex items-center justify-center gap-4">
-                            <button className="px-8 py-3.5 bg-white text-blue-600 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg shadow-blue-900/20">
+                            <button
+                                onClick={() => feature.route ? navigate(feature.route) : navigate('/login')}
+                                className="px-6 py-2.5 bg-white text-blue-600 rounded-full font-bold text-base hover:bg-blue-50 transition-colors shadow-lg shadow-blue-900/20"
+                            >
                                 Get Started
                             </button>
+                            {/* Scroll-to-hash navigation via Router State */}
                             <button
-                                onClick={() => navigate('/')}
-                                className="px-8 py-3.5 bg-blue-700/50 text-white border border-blue-400/30 rounded-full font-semibold text-lg hover:bg-blue-700 transition-colors backdrop-blur-sm flex items-center gap-2"
+                                onClick={() => navigate('/', { state: { scrollTo: 'why-choose-workspace' } })}
+                                className="px-6 py-2.5 bg-blue-700/50 text-white border border-blue-400/30 rounded-full font-semibold text-base hover:bg-blue-700 transition-colors backdrop-blur-sm flex items-center gap-2"
                             >
-                                <ArrowLeft className="w-5 h-5" />
-                                Back to Home
+                                <ArrowLeft className="w-4 h-4" />
+                                Back
                             </button>
                         </div>
                     </motion.div>
@@ -135,14 +140,7 @@ const FeatureDetail = () => {
                                     ))}
                                 </div>
 
-                                {/* Detailed Visual/Image */}
-                                <div className="mt-16 rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10">
-                                    <img
-                                        src={feature.image}
-                                        alt={feature.title}
-                                        className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
-                                    />
-                                </div>
+                                {/* Image Removed as requested */}
                             </motion.div>
                         </div>
                     </div>

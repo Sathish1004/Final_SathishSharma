@@ -239,10 +239,24 @@ export const getProjectStats = async (req, res) => {
         const rejectedQuery = "SELECT COUNT(*) as count FROM projects WHERE status = 'Rejected'";
         const recentQuery = "SELECT title, student_name as student, status FROM projects ORDER BY created_at DESC LIMIT 3";
 
-        const [pending] = await db.query(pendingQuery);
-        const [approved] = await db.query(approvedQuery);
-        const [rejected] = await db.query(rejectedQuery);
-        const [recent] = await db.query(recentQuery);
+        let pendingCount = 0;
+        let approvedCount = 0;
+        let rejectedCount = 0;
+        let recentProjects = [];
+
+        try {
+            const [pending] = await db.query(pendingQuery);
+            const [approved] = await db.query(approvedQuery);
+            const [rejected] = await db.query(rejectedQuery);
+            const [recent] = await db.query(recentQuery);
+
+            pendingCount = pending[0].count;
+            approvedCount = approved[0].count;
+            rejectedCount = rejected[0].count;
+            recentProjects = recent;
+        } catch (dbError) {
+            console.warn('Projects table might be missing, using mock data:', dbError.message);
+        }
 
         // Base Data
         const basePending = 3;
@@ -250,10 +264,10 @@ export const getProjectStats = async (req, res) => {
         const baseRejected = 12;
 
         res.json({
-            pending: pending[0].count + basePending,
-            approved: approved[0].count + baseApproved,
-            rejected: rejected[0].count + baseRejected,
-            recent: recent.length > 0 ? recent : [
+            pending: pendingCount + basePending,
+            approved: approvedCount + baseApproved,
+            rejected: rejectedCount + baseRejected,
+            recent: recentProjects.length > 0 ? recentProjects : [
                 // Fallback recent projects
                 { title: "E-Commerce API", student: "Arjun V", status: "Pending" },
                 { title: "Portfolio Site", student: "Meera R", status: "Approved" },
@@ -262,7 +276,7 @@ export const getProjectStats = async (req, res) => {
         });
 
     } catch (error) {
-        console.warn('Projects table might be missing or different schema:', error.message);
+        console.warn('Error in getProjectStats:', error.message);
         res.json({ pending: 3, approved: 145, rejected: 12, recent: [] });
     }
 };

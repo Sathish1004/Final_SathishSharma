@@ -60,7 +60,7 @@ export const register = async (req, res) => {
             expiresIn: '1d',
         });
 
-        res.status(201).json({ token, user: { id: userId, name, email, role } });
+        res.status(201).json({ token, user: { id: userId, name, email, role, profile_picture: null, resume_path: null } });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -180,7 +180,7 @@ export const login = async (req, res) => {
                 expiresIn: '1d',
             });
 
-            return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role } });
+            return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role, profile_picture: user.profile_picture, resume_path: user.resume_path } });
         }
 
         return res.status(400).json({ message: 'Invalid credentials' });
@@ -191,6 +191,7 @@ export const login = async (req, res) => {
     }
 };
 
+// Get current user (Admin or Student)
 export const getMe = async (req, res) => {
     try {
         const role = req.user.role; // Middleware should populate this from token
@@ -200,7 +201,7 @@ export const getMe = async (req, res) => {
             const [admins] = await db.query('SELECT user_id as id, full_name as name, email, role FROM admin WHERE user_id = ?', [req.user.id]);
             if (admins.length > 0) user = admins[0];
         } else {
-            const [users] = await db.query('SELECT id, name, email FROM users WHERE id = ?', [req.user.id]);
+            const [users] = await db.query('SELECT id, name, email, profile_picture, resume_path FROM users WHERE id = ?', [req.user.id]);
             if (users.length > 0) user = users[0];
         }
 
@@ -211,7 +212,7 @@ export const getMe = async (req, res) => {
         // Ensure role is in the response (admins query has it, users query doesn't explicitly have it in select unless I add it)
         // Helper function wasn't strictly robust for DB vs hardcoded.
         // Let's explicitly set it.
-        user.role = role || (user.email === ADMIN_EMAIL ? 'ADMIN' : 'STUDENT');
+        user.role = role || (user.email === 'admin@prolync.in' ? 'ADMIN' : 'STUDENT');
 
         res.json(user);
     } catch (error) {
@@ -286,6 +287,47 @@ export const resetPassword = async (req, res) => {
         res.json({ message: 'Password reset successfully' });
     } catch (error) {
         console.error('Reset password error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+export const changePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    try {
+        if (role === 'ADMIN') {
+            const [admins] = await db.query('SELECT * FROM admin WHERE user_id = ?', [userId]);
+            if (admins.length === 0) return res.status(404).json({ message: 'User not found' });
+
+            const admin = admins[0];
+            if (admin.password !== currentPassword) {
+                return res.status(400).json({ message: 'Incorrect current password' });
+            }
+
+            await db.query('UPDATE admin SET password = ? WHERE user_id = ?', [newPassword, userId]);
+        } else {
+            const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+            if (users.length === 0) return res.status(404).json({ message: 'User not found' });
+
+            const user = users[0];
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Incorrect current password' });
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
+        }
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Change password error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
