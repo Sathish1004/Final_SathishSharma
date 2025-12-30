@@ -67,16 +67,18 @@ export default function DashboardLayout() {
       {/* Sidebar (Desktop) */}
       <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 text-white transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-28'} hidden md:flex flex-col shadow-xl`}>
         <div className={`h-16 flex items-center border-b border-slate-800 transition-all duration-300 ${isSidebarOpen ? 'px-6 justify-start' : 'justify-center p-0'}`}>
-          <div className="flex items-center gap-3">
-            <div className="bg-white p-1.5 rounded-lg flex items-center justify-center">
-              <img src="/brand-logo.png" alt="Prolync Logo" className="h-5 w-5 object-contain" />
-            </div>
-            {isSidebarOpen && (
-              <span className="text-xl font-bold text-white tracking-tight animate-in fade-in duration-200">
+          {isSidebarOpen ? (
+            <div className="bg-white px-4 py-2 rounded-xl flex items-center gap-3 shadow-sm">
+              <img src="/brand-logo.png" alt="Prolync Logo" className="h-6 w-6 object-contain" />
+              <span className="text-xl font-bold text-slate-900 tracking-tight">
                 Prolync
               </span>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="bg-white p-2 rounded-lg flex items-center justify-center">
+              <img src="/brand-logo.png" alt="Prolync Logo" className="h-6 w-6 object-contain" />
+            </div>
+          )}
         </div>
 
         <div className="flex-1 py-6 overflow-y-auto">

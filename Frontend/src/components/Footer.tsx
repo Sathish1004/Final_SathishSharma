@@ -168,7 +168,7 @@ const Footer = () => {
                 {/* Bottom Section: Copyright & Legal */}
                 <div className="border-t border-slate-800/60 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
                     <p>
-                        &copy; 2025 <span className="text-slate-400 font-medium">Prolync Infotech Pvt Limited</span>. All rights reserved.
+                        &copy; 2025 <span className="text-slate-400 font-medium">Prolync Infotech.in  Pvt  Ltd</span>. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
                         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
