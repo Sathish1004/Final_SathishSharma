@@ -94,6 +94,13 @@ export default function OnboardingOverlay() {
             const left = rect.right + 15;
             const top = rect.top + (rect.height / 2); // vertically centered to item
             setPosition({ top, left });
+        } else {
+            // Fallback: Center screen if sidebar item not found
+            // This prevents "Blur Screen of Death" if triggered on non-dashboard pages
+            setPosition({
+                top: window.innerHeight / 2,
+                left: window.innerWidth / 2
+            });
         }
     };
 

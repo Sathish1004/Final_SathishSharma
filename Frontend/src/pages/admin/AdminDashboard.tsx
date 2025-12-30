@@ -34,7 +34,8 @@ import {
     ExternalLink,
     Trash2,
     Home,
-    Phone
+    Phone,
+    PanelLeft
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -295,28 +296,27 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-slate-50 flex">
             {/* Sidebar (Desktop) */}
-            <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 text-white transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} hidden md:flex flex-col`}>
-                <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+            <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 text-white transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-28'} hidden md:flex flex-col shadow-xl`}>
+                <div className={`h-16 flex items-center border-b border-slate-800 transition-all duration-300 ${isSidebarOpen ? 'px-6 justify-start' : 'justify-center p-0'}`}>
                     <div className="flex items-center gap-3">
-                        <img src="/brand-logo.png" alt="Prolync Logo" className="h-8 w-8 object-contain" />
+                        <div className="bg-white p-1.5 rounded-lg flex items-center justify-center">
+                            <img src="/brand-logo.png" alt="Prolync Logo" className="h-5 w-5 object-contain" />
+                        </div>
                         {isSidebarOpen && (
-                            <span className="text-xl font-bold text-white tracking-tight">
+                            <span className="text-xl font-bold text-white tracking-tight animate-in fade-in duration-200">
                                 Prolync
                             </span>
                         )}
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-slate-400 hover:text-white">
-                        {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                    </Button>
                 </div>
 
                 <div className="flex-1 py-6 overflow-y-auto">
-                    <nav className="space-y-1 px-2">
+                    <nav className={`space-y-4 ${isSidebarOpen ? 'px-3' : 'px-1'}`}>
                         {sidebarItems.map((item) => (
                             <button
                                 key={item.id}
                                 onClick={() => setActiveModule(item.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${activeModule === item.id
+                                className={`w-full flex items-center ${isSidebarOpen ? 'px-3' : 'justify-center px-0'} py-3 rounded-lg transition-all duration-200 group relative ${activeModule === item.id
                                     ? item.id === 'features'
                                         ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
                                         : 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
@@ -324,9 +324,10 @@ export default function AdminDashboard() {
                                         ? 'text-indigo-400 hover:bg-indigo-500/10 hover:text-indigo-300'
                                         : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
+                                title={!isSidebarOpen ? item.label : ''}
                             >
-                                <item.icon className="h-5 w-5 flex-shrink-0" />
-                                {isSidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
+                                <item.icon className={`h-5 w-5 flex-shrink-0 transition-transform duration-200 ${!isSidebarOpen && 'group-hover:scale-110'}`} />
+                                {isSidebarOpen && <span className="font-medium text-sm ml-3 animate-in fade-in slide-in-from-left-2 duration-200">{item.label}</span>}
                             </button>
                         ))}
                     </nav>
@@ -337,12 +338,22 @@ export default function AdminDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
+            <main className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'md:ml-28'}`}>
                 {/* Top Header */}
-                <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-6 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-slate-800 capitalize">
-                        {sidebarItems.find(i => i.id === activeModule)?.label}
-                    </h1>
+                <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="hidden md:flex text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                        >
+                            <PanelLeft className={`h-5 w-5 transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+                        </Button>
+                        <h1 className="text-xl font-bold text-slate-800 capitalize">
+                            {sidebarItems.find(i => i.id === activeModule)?.label}
+                        </h1>
+                    </div>
                     <div className="flex items-center gap-4">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

@@ -43,6 +43,7 @@ const FeatureDetail = lazy(() => import('./pages/FeatureDetail'));
 import DashboardLayout from "./components/layout/DashboardLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import AdminRoute from "./components/auth/AdminRoute";
+import ScrollToTop from "./components/ScrollToTop";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ const App = () => (
       <Toaster />
       <Sonner position="top-right" />
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <NotificationProvider>
             <Suspense fallback={<PageLoader />}>

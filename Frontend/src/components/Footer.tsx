@@ -73,7 +73,11 @@ const Footer = () => {
                                 { label: "Login / Register", href: "/login" }
                             ]).map((item, i) => (
                                 <li key={i}>
-                                    <Link to={item.href} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-all duration-300">
+                                    <Link
+                                        to={item.href}
+                                        className="group flex items-center gap-2 text-slate-400 hover:text-white transition-all duration-300"
+                                        onClick={() => window.scrollTo(0, 0)}
+                                    >
                                         <ArrowRight className="w-3.5 h-3.5 text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                         <span className="text-[15px]">{item.label}</span>
                                     </Link>

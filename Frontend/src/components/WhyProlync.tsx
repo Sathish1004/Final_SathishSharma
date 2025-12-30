@@ -64,7 +64,7 @@ const WhyProlync = () => {
     const Icon = activeBlock.icon;
 
     return (
-        <section className="py-12 bg-white relative overflow-hidden">
+        <section id="why-choose-workspace" className="py-12 bg-white relative overflow-hidden">
             {/* Background Glow */}
             <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br transition-all duration-1000 blur-[120px] opacity-20 pointer-events-none rounded-full ${activeBlock.gradient}`} />
 

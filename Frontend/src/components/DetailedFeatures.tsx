@@ -6,8 +6,8 @@ const features = [
         description: "Student Workspace provides industry-aligned courses with videos, hands-on learning, and certifications. Students can learn at their own pace and build strong fundamentals.",
         image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop",
         link: "Explore courses",
-        bgColor: "bg-[#FFF4ED]", // Soft Peach
-        titleColor: "text-orange-600",
+        bgColor: "bg-blue-50", // Light Blue
+        titleColor: "text-blue-600",
         icon: BookOpen
     },
     {
@@ -15,8 +15,8 @@ const features = [
         description: "Learners can solve real-world coding problems, run test cases, and work on projects. This helps bridge the gap between theory and practical skills.",
         image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2670&auto=format&fit=crop",
         link: "Start coding",
-        bgColor: "bg-[#FEFCE8]", // Soft Yellow/Cream
-        titleColor: "text-yellow-700",
+        bgColor: "bg-red-50", // Light Red
+        titleColor: "text-red-600",
         icon: Code2
     },
     {
@@ -24,8 +24,8 @@ const features = [
         description: "Students get access to mentors, career guidance, internships, and job opportunities — all from a single dashboard.",
         image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=2670&auto=format&fit=crop",
         link: "View mentorship",
-        bgColor: "bg-[#F5F3FF]", // Soft Lavender
-        titleColor: "text-purple-600",
+        bgColor: "bg-green-50", // Light Green
+        titleColor: "text-green-600",
         icon: Users
     }
 ];

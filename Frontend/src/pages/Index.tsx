@@ -46,6 +46,16 @@ export default function Index() {
         window.history.replaceState({}, document.title);
       }
     }
+    // Handle Hash Navigation (Standard Links)
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
   }, [user, loading, navigate, location]);
 
   return (
@@ -83,7 +93,7 @@ export default function Index() {
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-4 md:mb-10">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-500 h-12 px-8 text-lg font-semibold rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-all hover:-translate-y-0.5 border border-blue-400/30"
+                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-500 h-10 px-6 text-sm md:h-12 md:px-8 md:text-lg font-semibold rounded-lg shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-all hover:-translate-y-0.5 border border-green-400/30"
                     onClick={() => navigate('/pricing')}
                   >
                     Start Free Trial
@@ -178,3 +188,7 @@ export default function Index() {
     </div>
   );
 }
+
+
+
+

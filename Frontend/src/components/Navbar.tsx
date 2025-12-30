@@ -33,7 +33,10 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 {/* 1. Logo (Far Left) */}
                 <div
                     className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => navigate('/')}
+                    onClick={() => {
+                        navigate('/');
+                        window.scrollTo(0, 0);
+                    }}
                 >
                     <img src="/prolync_logo.png" alt="Prolync" className="h-12 md:h-16 w-auto object-contain" />
                 </div>

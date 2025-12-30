@@ -276,6 +276,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     if (!isOpen) return null;
 
+    const isOtpStep = (!isLogin && signupStep === 2) || (isLogin && loginStep === 2) || (forgotMode && forgotStep === 2);
+    const isButtonDisabled = loading || (isOtpStep && !otp);
+
     return (
         <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[4px]"
@@ -480,8 +483,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
                     <Button
                         onClick={handleSubmit}
-                        disabled={loading}
-                        className="w-full h-12 bg-[#10b981] hover:bg-[#059669] text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-emerald-500/20 transition-all duration-300"
+                        disabled={isButtonDisabled}
+                        className={`w-full h-12 text-lg font-semibold rounded-xl transition-all duration-300 ${isButtonDisabled
+                                ? 'bg-emerald-200 text-emerald-700 shadow-none cursor-not-allowed'
+                                : 'bg-[#10b981] hover:bg-[#059669] text-white shadow-lg hover:shadow-emerald-500/20'
+                            }`}
                     >
                         {loading ? (
                             <>

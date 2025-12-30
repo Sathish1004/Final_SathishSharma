@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import LoginModal from "@/components/LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
-import OnboardingOverlay from "../OnboardingOverlay";
+
 
 export default function PublicLayout() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function PublicLayout() {
                 <Outlet context={{ setIsLoginModalOpen }} />
             </main>
             <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-            {showOnboarding && <OnboardingOverlay />}
+
         </div>
     );
 }
