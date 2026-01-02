@@ -41,6 +41,13 @@ interface CourseContextType {
         completedCourses: number;
         activeCourses: number;
         notStartedCourses: number;
+        // Premium Dashboard Stats
+        problemsSolved?: number;
+        projectsSubmitted?: number;
+        badgesEarned?: number;
+        jobsApplied?: number;
+        mentorBookings?: number;
+        nextSession?: any;
     };
     enroll: (courseId: number) => Promise<void>;
     updateProgress: (courseId: number, moduleIndex: number, moduleId: number, minutesWatched?: number) => void;

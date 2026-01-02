@@ -3,67 +3,54 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCourse } from '@/contexts/CourseContext';
 import {
   BookOpen, Activity, PlayCircle, CheckCircle2, Clock, Calendar, ArrowRight, Zap,
-  Award, Lock, Share2, Copy, Check, Flame
+  Award, Lock, Share2, Copy, Check, Flame, Trophy, Briefcase, Code, Users, Search,
+  Github, Linkedin, FileText, ExternalLink
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/components/ui/use-toast";
 import FeatureGuard from "@/components/FeatureGuard";
-import { StreakCalendar } from '@/components/dashboard/StreakCalendar';
 import { ActivityCalendar } from '@/components/dashboard/ActivityCalendar';
 import CertificateModal from '@/components/CertificateModal';
-
-// Mock generator for modules (restoring this utility)
-const generateModules = (courseTitle: string) => {
-  const structure = [
-    { title: 'Module 01: Introduction', duration: '10 min' },
-    { title: 'Module 02: Core Concepts', duration: '15 min' },
-    { title: 'Module 03: Practical Example', duration: '20 min' },
-    { title: 'Module 04: Intermediate Concepts', duration: '15 min' },
-    { title: 'Module 05: Hands-on Demo', duration: '20 min' },
-    { title: 'Module 06: Problem Solving', duration: '25 min' },
-    { title: 'Module 07: Advanced Topic', duration: '30 min' },
-    { title: 'Module 08: Real-world Use Case', duration: '20 min' },
-  ];
-  return structure.map((item, i) => ({
-    id: i + 1,
-    title: item.title,
-    duration: item.duration,
-  }));
-};
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
-  const { courses, progressMap, activityLogs, stats } = useCourse();
+  const navigate = useNavigate();
+  const { courses, progressMap, stats: rawStats } = useCourse();
   const firstName = user?.name?.split(' ')[0] || 'Student';
 
+  // --- Extended Stats with Fallbacks ---
+  // --- Extended Stats with Fallbacks ---
+  const stats = {
+    ...rawStats,
+    problemsSolved: rawStats?.problemsSolved ?? 0,
+    projectsSubmitted: rawStats?.projectsSubmitted ?? 0,
+    badgesEarned: rawStats?.badgesEarned ?? 0,
+    jobsApplied: rawStats?.jobsApplied ?? 0,
+    mentorBookings: rawStats?.mentorBookings ?? 0,
+    nextSession: rawStats?.nextSession ?? null
+  };
+
   // --- Logic for Sections ---
-  const courseList = courses.map(c => {
-    const p = progressMap[c.id];
-    return {
-      ...c,
-      progress: p?.progress || 0,
-      status: p?.status || 'Not Started',
-      lastAccessedAt: p?.lastAccessedAt || null,
-      minutesConsumed: p?.minutesConsumed || 0,
-      completedModules: p?.completedModules || []
-    };
-  });
-
-  const activeCourses = courseList.filter(c => c.status === 'In Progress' || c.status === 'Completed')
-    .sort((a, b) => new Date(b.lastAccessedAt || 0).getTime() - new Date(a.lastAccessedAt || 0).getTime());
-
-  const completedCourses = courseList.filter(c => c.status === 'Completed');
-  const mostRecentCourse = activeCourses[0];
-  const recentModules = mostRecentCourse ? generateModules(mostRecentCourse.title) : [];
+  // Filter for Completed Courses for the Achievements section
+  const completedCoursesList = courses.filter(c => progressMap[c.id]?.status === 'Completed');
 
   // Certificate Modal State
   const [showCertModal, setShowCertModal] = useState(false);
@@ -76,7 +63,6 @@ export default function Dashboard() {
 
   const handleShareProgress = async () => {
     try {
-      // Mock share data generation
       const dummyUrl = `https://workspace.prolync.in/share/${user?.id || 'demo'}/${Date.now()}`;
       setShareUrl(dummyUrl);
       setShowShareModal(true);
@@ -96,7 +82,7 @@ export default function Dashboard() {
     <FeatureGuard feature="dashboard">
       <div className="container mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-500 min-h-screen pb-20 bg-slate-50/50">
 
-        {/* 1. WELCOME HEADER */}
+        {/* 1. HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -106,283 +92,357 @@ export default function Dashboard() {
               Let's continue your learning journey
             </p>
           </div>
-          <Button onClick={handleShareProgress} variant="outline" className="gap-2 hidden md:flex">
-            <Share2 className="h-4 w-4" /> Share Progress
-          </Button>
+
+          <div className="flex items-center gap-4">
+            <Button onClick={handleShareProgress} variant="outline" className="gap-2 hidden md:flex border-blue-200 text-blue-700 hover:bg-blue-50">
+              <Share2 className="h-4 w-4" /> Share Progress
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-3 pl-4 border-l cursor-pointer hover:opacity-80 transition-opacity">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                    <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+                  </div>
+                  <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-2 ring-slate-100">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} />
+                    <AvatarFallback>{firstName[0]}</AvatarFallback>
+                  </Avatar>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={logout}>
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
-        {/* 2. STATS CARDS */}
+        {/* 2. METRICS ROW 1 (4 COLORED BOXES) */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Link to="/courses?status=progress">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Active Courses</p>
-                  <p className="text-3xl font-bold text-slate-900">{stats.activeCourses}</p>
+          {/* Box 1: Courses Completed (Green Gradient) */}
+          <Card
+            className="border-none shadow-md overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300"
+            onClick={() => navigate('/courses')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-emerald-100/50 opacity-100" />
+            <div className="absolute -right-6 -top-6 h-24 w-24 bg-emerald-200/40 rounded-full blur-2xl group-hover:bg-emerald-300/40 transition-colors" />
+            <CardContent className="p-6 relative isolate">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-white rounded-xl shadow-sm text-emerald-600 ring-1 ring-emerald-100">
+                  <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <div className="h-10 w-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-5 w-5" />
+                <Badge variant="secondary" className="bg-white/80 backdrop-blur text-emerald-700 shadow-sm">
+                  Verified
+                </Badge>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.completedCourses}</p>
+                <p className="text-sm font-medium text-emerald-700 mt-1">Courses Completed</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Box 2: Problems Solved (Blue Gradient) */}
+          <Card
+            className="border-none shadow-md overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300"
+            onClick={() => navigate('/coding')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100/50 opacity-100" />
+            <div className="absolute -right-6 -top-6 h-24 w-24 bg-blue-200/40 rounded-full blur-2xl group-hover:bg-blue-300/40 transition-colors" />
+            <CardContent className="p-6 relative isolate">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-white rounded-xl shadow-sm text-blue-600 ring-1 ring-blue-100">
+                  <Code className="h-6 w-6" />
                 </div>
+                <Badge variant="secondary" className="bg-white/80 backdrop-blur text-blue-700 shadow-sm">
+                  Top 10%
+                </Badge>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.problemsSolved}</p>
+                <p className="text-sm font-medium text-blue-700 mt-1">Problems Solved</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Box 3: Projects Submitted (Purple Gradient) */}
+          <Card
+            className="border-none shadow-md overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300"
+            onClick={() => navigate('/projects')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-50 to-violet-100/50 opacity-100" />
+            <div className="absolute -right-6 -top-6 h-24 w-24 bg-violet-200/40 rounded-full blur-2xl group-hover:bg-violet-300/40 transition-colors" />
+            <CardContent className="p-6 relative isolate">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-white rounded-xl shadow-sm text-violet-600 ring-1 ring-violet-100">
+                  <Briefcase className="h-6 w-6" />
+                </div>
+                <Badge variant="secondary" className="bg-white/80 backdrop-blur text-violet-700 shadow-sm">
+                  Review Pending
+                </Badge>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.projectsSubmitted}</p>
+                <p className="text-sm font-medium text-violet-700 mt-1">Projects Submitted</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Box 4: Badges Earned (Amber Gradient) */}
+          <Card
+            className="border-none shadow-md overflow-hidden relative group cursor-pointer hover:shadow-lg transition-all duration-300"
+            onClick={() => navigate('/profile')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-amber-100/50 opacity-100" />
+            <div className="absolute -right-6 -top-6 h-24 w-24 bg-amber-200/40 rounded-full blur-2xl group-hover:bg-amber-300/40 transition-colors" />
+            <CardContent className="p-6 relative isolate">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-white rounded-xl shadow-sm text-amber-600 ring-1 ring-amber-100">
+                  <Trophy className="h-6 w-6" />
+                </div>
+                <Badge variant="secondary" className="bg-white/80 backdrop-blur text-amber-700 shadow-sm">
+                  Elite
+                </Badge>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 tracking-tight">{stats.badgesEarned}</p>
+                <p className="text-sm font-medium text-amber-700 mt-1">Badges Earned</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 3. ROW 2: ACTIVITY & QUICK STATS */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* LEFT: BIG BOX - ACTIVITY & STREAK (2/3) */}
+          <div className="lg:col-span-2">
+            <Card className="border-slate-200 shadow-sm h-full hover:shadow-md transition-shadow">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                      Learning Activity
+                    </CardTitle>
+                    <p className="text-sm text-slate-500">Track your daily progress and consistency</p>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-orange-50 text-orange-600 rounded-full border border-orange-100">
+                    <Flame className="h-4 w-4 fill-current" />
+                    <span className="font-bold">{stats.streak} Day Streak</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* We use ActivityCalendar as the main visual here */}
+                <ActivityCalendar />
               </CardContent>
             </Card>
-          </Link>
-          <Link to="/courses?status=completed">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6 flex items-center justify-between">
+          </div>
+
+          {/* RIGHT: 3 SMALL BOXES (1/3) */}
+          <div className="space-y-6">
+
+            {/* 1. Active Courses */}
+            <Card
+              className="border-slate-200 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+              onClick={() => navigate('/courses')}
+            >
+              <CardContent className="p-5 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Completed</p>
-                  <p className="text-3xl font-bold text-slate-900">{stats.completedCourses}</p>
+                  <p className="text-sm font-medium text-slate-500">Active Learning</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">{stats.activeCourses} Courses</p>
+                  <div className="mt-2 w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 w-2/3" />
+                  </div>
                 </div>
-                <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
-                  <CheckCircle2 className="h-5 w-5" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/courses">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Total Learning Time</p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {Math.floor(stats.totalMinutes / 60)}<span className="text-sm text-slate-400 font-normal mx-1">h</span>
-                    {stats.totalMinutes % 60}<span className="text-sm text-slate-400 font-normal mx-1">m</span>
-                  </p>
-                </div>
-                <div className="h-10 w-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
-                  <Clock className="h-5 w-5" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/courses?status=not-started">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Not Started</p>
-                  <p className="text-3xl font-bold text-slate-900">{stats.notStartedCourses}</p>
-                </div>
-                <div className="h-10 w-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">
+                <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                   <PlayCircle className="h-5 w-5" />
                 </div>
               </CardContent>
             </Card>
-          </Link>
+
+            {/* 2. Jobs Applied */}
+            <Card
+              className="border-slate-200 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+              onClick={() => navigate('/jobs')}
+            >
+              <CardContent className="p-5 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Career Ops</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">{stats.jobsApplied} Applied</p>
+                  <p className="text-xs text-slate-400 mt-1">2 Interviews Pending</p>
+                </div>
+                <div className="h-10 w-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Briefcase className="h-5 w-5" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 3. Mentor Booking */}
+            <Card
+              className="border-slate-200 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+              onClick={() => navigate('/mentors')}
+            >
+              <CardContent className="p-5 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Mentorship</p>
+                  {stats.nextSession ? (
+                    <div>
+                      <p className="text-lg font-bold text-slate-900 mt-1">{new Date(stats.nextSession.schedule_time).toLocaleDateString()}</p>
+                      <p className="text-xs text-blue-600 font-medium">Upcoming Session</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-lg font-bold text-slate-900 mt-1">No Bookings</p>
+                      <p className="text-xs text-blue-600 font-medium">Book a session today</p>
+                    </div>
+                  )}
+                </div>
+                <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Users className="h-5 w-5" />
+                </div>
+              </CardContent>
+            </Card>
+
+          </div>
         </div>
 
-        {/* 3. MAIN DASHBOARD CONTENT */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* 4. BOTTOM SECTIONS: MENTOR, PORTFOLIO, CERTS */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          {/* LEFT COLUMN (Main Content) - Spans Full Width now */}
-          <div className="lg:col-span-12 space-y-8">
+          {/* LEFT: MENTOR CARD & SOCIALS */}
+          <div className="space-y-6">
 
-            {/* A. CONTINUE LEARNING & CALENDAR SPLIT */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-              {/* Left: Continue Learning (2/3 width) */}
-              <div className="xl:col-span-2">
-                <FeatureGuard feature="courses" fallback={<div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100 text-center text-slate-500 py-12">Course access is currently disabled by administrator.</div>}>
-                  <section className="space-y-4 h-full">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-1 bg-blue-600 rounded-full" />
-                      <h2 className="text-xl font-bold text-slate-800">Continue Learning</h2>
-                    </div>
+            {/* Mentor Highlight */}
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-12 translate-x-12" />
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-2">Expert Mentorship</h3>
+                <p className="text-slate-300 mb-6 max-w-md">Connect with industry experts to review your projects and guide your career path.</p>
 
-                    {mostRecentCourse ? (
-                      <Card className="border-blue-100 shadow-sm hover:shadow-md transition-shadow">
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row justify-between gap-6 mb-8">
-                            <div className="space-y-4 flex-1">
-                              <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1">
-                                {mostRecentCourse.category}
-                              </Badge>
-                              <div>
-                                <h3 className="text-2xl font-bold text-slate-900 mb-2">{mostRecentCourse.title}</h3>
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                                  <span className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded">
-                                    <Clock className="h-3.5 w-3.5" /> {mostRecentCourse.minutesConsumed}m watched
-                                  </span>
-                                  <span className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded">
-                                    <Calendar className="h-3.5 w-3.5" /> Last activity: {new Date(mostRecentCourse.lastAccessedAt || Date.now()).toLocaleDateString()}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="md:w-72 space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-100 h-fit">
-                              <div className="flex justify-between text-sm font-medium items-center">
-                                <span className="text-slate-700">Course Progress</span>
-                                <span className="text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md">{mostRecentCourse.progress}%</span>
-                              </div>
-                              <Progress value={mostRecentCourse.progress} className="h-2.5" />
-                              <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-sm" size="lg" asChild>
-                                <Link to={`/courses/${mostRecentCourse.id}`}>
-                                  Resume Learning <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-
-                          {/* Suggested Modules */}
-                          <div className="space-y-4 pt-6 border-t border-slate-100">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold text-slate-700">Suggested Next Modules</p>
-                            </div>
-                            <ScrollArea className="w-full whitespace-nowrap pb-2">
-                              <div className="flex gap-4">
-                                {recentModules.map((module, i) => {
-                                  const isCompleted = mostRecentCourse.completedModules?.includes(module.id);
-                                  const firstUncompletedId = recentModules.find(m => !mostRecentCourse.completedModules?.includes(m.id))?.id;
-                                  const isCurrent = !isCompleted && module.id === firstUncompletedId;
-
-                                  return (
-                                    <Link
-                                      key={module.id}
-                                      to={`/courses/${mostRecentCourse.id}`}
-                                      state={{ moduleIndex: i }}
-                                      className={`inline-flex flex-col justify-between w-[180px] p-4 rounded-xl border transition-all cursor-pointer hover:scale-[1.02] duration-200
-                                            ${isCurrent ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100 shadow-sm' : 'bg-white border-slate-200 opacity-90 hover:opacity-100'}
-                                        `}>
-                                      <div className="flex justify-between items-start mb-3">
-                                        <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-white border-slate-200 text-slate-500 font-mono">MOD {String(i + 1).padStart(2, '0')}</Badge>
-                                        {isCompleted ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : isCurrent ? <PlayCircle className="h-4 w-4 text-blue-500 animate-pulse" /> : <Lock className="h-4 w-4 text-slate-300" />}
-                                      </div>
-                                      <p className="text-xs font-semibold whitespace-normal line-clamp-2 text-slate-800 leading-relaxed" title={module.title}>
-                                        {module.title.replace(/Module \d+: /, '')}
-                                      </p>
-                                    </Link>
-                                  );
-                                })}
-                              </div>
-                              <ScrollBar orientation="horizontal" />
-                            </ScrollArea>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <Card className="border-dashed border-2 bg-slate-50/50">
-                        <CardContent className="p-10 text-center flex flex-col items-center justify-center">
-                          <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                            <BookOpen className="h-8 w-8 text-blue-500" />
-                          </div>
-                          <h3 className="text-lg font-bold text-slate-900 mb-2">Start Your Journey Today</h3>
-                          <p className="text-slate-500 mb-6 max-w-sm">You haven't enrolled in any courses yet. Browse our catalog to find your first course.</p>
-                          <Button asChild className="bg-blue-600 hover:bg-blue-700 px-8"><Link to="/courses">Browse Courses</Link></Button>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </section>
-                </FeatureGuard>
-              </div>
-
-              {/* Right: Activity Calendar (1/3 width) */}
-              <div className="xl:col-span-1 h-full">
-                <ActivityCalendar className="h-full min-h-[400px]" />
+                <div className="flex items-center gap-4">
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-500 border-none shadow-lg shadow-blue-900/20"
+                    onClick={() => navigate('/mentors')}
+                  >
+                    Find a Mentor
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10 hover:text-white"
+                    onClick={() => navigate('/mentors')}
+                  >
+                    My Sessions
+                  </Button>
+                </div>
               </div>
             </div>
-            <div className={`grid grid-cols-1 gap-6 ${completedCourses.length > 0 ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
 
-              {/* C. RECENT ACTIVITY */}
-              <section className="space-y-4 h-full flex flex-col">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                    <Activity className="h-4 w-4" />
+            {/* Social Links & Portfolio */}
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg">Your Portfolio & Socials</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                  <div className="flex-1 truncate">
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Portfolio Link</p>
+                    <p className="text-sm font-mono text-slate-700 truncate">workspace.prolync.in/u/{user?.id || 'me'}</p>
                   </div>
-                  <h2 className="text-xl font-bold text-slate-800">Recent Activity</h2>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 text-slate-500" onClick={() => {
+                    navigator.clipboard.writeText(`workspace.prolync.in/u/${user?.id}`);
+                    toast({ title: "Copied" });
+                  }}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
 
-                <Card className="border-slate-200 shadow-sm h-full flex flex-col">
-                  <CardContent className="p-0 flex-1 min-h-0">
-                    <ScrollArea className="h-[200px]">
-                      {activityLogs.length > 0 ? (
-                        <div className="p-6">
-                          <div className="space-y-6">
-                            {activityLogs.map((log, index) => (
-                              <div key={index} className="flex gap-4 relative group">
-                                {index !== activityLogs.length - 1 && (
-                                  <div className="absolute left-[19px] top-8 bottom-[-24px] w-0.5 bg-slate-100 group-hover:bg-slate-200 transition-colors" />
-                                )}
-                                <div className={`
-                                      h-10 w-10 shrink-0 rounded-full flex items-center justify-center border-4 border-white shadow-sm z-10
-                                      ${log.type === 'COURSE_COMPLETED' ? 'bg-green-100 text-green-600' :
-                                    log.type === 'ENROLLED' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}
-                                   `}>
-                                  {log.type === 'COURSE_COMPLETED' ? <Award className="h-4 w-4" /> :
-                                    log.type === 'ENROLLED' ? <BookOpen className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
-                                </div>
-
-                                <div className="space-y-1 py-1">
-                                  <p className="text-sm font-semibold text-slate-800 leading-none">{log.detail}</p>
-                                  <p className="text-xs text-slate-500 font-medium">
-                                    {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-12 text-slate-400">
-                          <Activity className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                          <p>No activity yet</p>
-                        </div>
-                      )}
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              </section>
-
-              {/* D. ACHIEVEMENTS */}
-              <FeatureGuard feature="courses" quiet>
-                {completedCourses.length > 0 && (
-                  <section className="space-y-4 h-full flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-amber-500" />
-                      <h2 className="text-xl font-bold text-slate-800">Achievements</h2>
-                    </div>
-                    <Card className="border-amber-100 bg-amber-50/30 h-full flex flex-col">
-                      <CardContent className="p-0 flex-1 min-h-0">
-                        <ScrollArea className="h-[200px]">
-                          <div className="divide-y divide-amber-100">
-                            {completedCourses.map(course => (
-                              <div key={course.id}
-                                className="p-4 flex items-center justify-between hover:bg-amber-50 cursor-pointer transition-colors group"
-                                onClick={() => {
-                                  setSelectedCert({
-                                    courseTitle: course.title,
-                                    instructor: course.instructor || 'Instructor',
-                                    date: new Date().toLocaleDateString(),
-                                    certId: `CERT-${course.id}`
-                                  });
-                                  setShowCertModal(true);
-                                }}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="h-9 w-9 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                    <Award className="h-5 w-5" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-bold text-slate-800 line-clamp-1">{course.title}</p>
-                                    <p className="text-xs text-amber-600 font-medium">View Certificate</p>
-                                  </div>
-                                </div>
-                                <ArrowRight className="h-4 w-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
-                              </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </CardContent>
-                    </Card>
-                  </section>
-                )}
-              </FeatureGuard>
-
-            </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <Button variant="outline" className="w-full gap-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50">
+                    <Github className="h-4 w-4" /> GitHub
+                  </Button>
+                  <Button variant="outline" className="w-full gap-2 border-slate-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+                    <Linkedin className="h-4 w-4" /> LinkedIn
+                  </Button>
+                  <Button variant="outline" className="w-full gap-2 border-slate-200 hover:border-red-200 hover:bg-red-50 hover:text-red-700">
+                    <FileText className="h-4 w-4" /> Resume
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
           </div>
 
-          {/* RIGHT COLUMN Removed - Streak relocated */}
+          {/* RIGHT: COURSE COMPLETION / CERTS */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800">Your Achievements</h2>
+              <Button variant="ghost" size="sm" className="text-blue-600 gap-1">
+                View All <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
 
+            <ScrollArea className="h-[320px] pr-4">
+              <div className="space-y-3">
+                {completedCoursesList.length > 0 ? completedCoursesList.map(course => (
+                  <div key={course.id} className="group p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-4"
+                    onClick={() => {
+                      setSelectedCert({
+                        courseTitle: course.title,
+                        instructor: course.instructor || 'Instructor',
+                        date: new Date().toLocaleDateString(),
+                        certId: `CERT-${course.id}`
+                      });
+                      setShowCertModal(true);
+                    }}
+                  >
+                    <div className="h-12 w-12 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center ring-1 ring-amber-100 group-hover:scale-105 transition-transform">
+                      <Award className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-slate-900 line-clamp-1">{course.title}</h4>
+                      <p className="text-xs text-slate-500">Completed on {new Date().toLocaleDateString()}</p>
+                    </div>
+                    <Button size="sm" variant="ghost" className="text-slate-400 group-hover:text-blue-600">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )) : (
+                  <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                    <Award className="h-10 w-10 text-slate-300 mx-auto mb-2" />
+                    <p className="text-slate-500 font-medium">No certificates yet</p>
+                    <Button variant="link" className="text-blue-600" onClick={() => window.location.href = '/courses'}>Start Learning</Button>
+                  </div>
+                )}
+
+                {/* Mock Achievement for Demo */}
+                <div className="p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-200 shadow-sm flex items-center gap-4 opacity-60 grayscale">
+                  <div className="h-12 w-12 rounded-lg bg-slate-200 text-slate-400 flex items-center justify-center">
+                    <Trophy className="h-6 w-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-slate-800">Coding Champion</h4>
+                    <p className="text-xs text-slate-500">Solve 50 Problems</p>
+                  </div>
+                  <div className="w-16">
+                    <Progress value={35} className="h-1.5" />
+                    <p className="text-[10px] text-right mt-1 text-slate-400">12/50</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
         </div>
+
       </div>
 
       <CertificateModal
@@ -417,7 +477,6 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
-
     </FeatureGuard>
   );
 }

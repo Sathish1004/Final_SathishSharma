@@ -78,28 +78,61 @@ export const getStudentStats = async (req, res) => {
         });
 
         // 3. Not Started Courses
-        // Logic: Total Available Courses - Enrolled Courses (where status is anything)
-        // Or if 'Not Started' is a status in user_progress?
-        // Enrolled usually creates a 'Not Started' or 'In Progress' record.
-        // Let's assume 'Not Started' count is Total Courses in platform - (Active + Completed) 
-        // OR simply Courses user hasn't enrolled in?
-        // Let's stick to what the Context originally did: defined set of courses minus enrolled ones.
-        // We'll fetch total courses count.
         const [totalCoursesRes] = await db.query("SELECT COUNT(*) as count FROM courses");
         const totalCourses = totalCoursesRes[0].count;
         const enrolledCount = progressRows.length;
         const notStartedCourses = Math.max(0, totalCourses - enrolledCount);
-        // Note: This logic assumes 'Not Started' = Unenrolled or Enrolled-but-0-progress (if distinct).
-        // If user_progress has 'Not Started' status, we should count that too.
-        // Let's assume user_progress records start as 'In Progress' (0%) or 'Not Started'.
-        // My logProgress logic uses 'In Progress' default.
+
+        // --- EXTENDED PREMIUM METRICS ---
+
+        // 4. Problems Solved (Coding)
+        let problemsSolved = 0;
+        try {
+            const [codingRows] = await db.query("SELECT COUNT(*) as count FROM coding_submissions WHERE user_id = ? AND status = 'Accepted'", [userId]);
+            problemsSolved = codingRows[0].count;
+        } catch (e) { /* Table might not exist */ }
+
+        // 5. Projects Submitted
+        let projectsSubmitted = 0;
+        try {
+            const [projectRows] = await db.query("SELECT COUNT(*) as count FROM project_submissions WHERE user_id = ?", [userId]);
+            projectsSubmitted = projectRows[0].count;
+        } catch (e) { /* Table might not exist */ }
+
+        // 6. Badges Earned (Logic: 1 per Course + 1 per 5 Problems)
+        const badgesEarned = completedCourses + Math.floor(problemsSolved / 5);
+
+        // 7. Jobs Applied
+        let jobsApplied = 0;
+        try {
+            const [jobRows] = await db.query("SELECT COUNT(*) as count FROM job_applications WHERE user_id = ?", [userId]);
+            jobsApplied = jobRows[0].count;
+        } catch (e) { /* Table might not exist */ }
+
+        // 8. Mentor Bookings (Upcoming)
+        let mentorBookings = 0;
+        let nextSession = null;
+        try {
+            const [mentorRows] = await db.query("SELECT COUNT(*) as count FROM mentor_appointments WHERE student_id = ? AND status = 'Scheduled'", [userId]);
+            mentorBookings = mentorRows[0].count;
+            // Get next session details if any
+            const [nextSess] = await db.query("SELECT * FROM mentor_appointments WHERE student_id = ? AND status = 'Scheduled' ORDER BY schedule_time ASC LIMIT 1", [userId]);
+            if (nextSess.length > 0) nextSession = nextSess[0];
+        } catch (e) { /* Table might not exist */ }
 
         res.json({
             totalMinutes,
             streak,
             completedCourses,
             activeCourses,
-            notStartedCourses
+            notStartedCourses,
+            // Premium Metrics
+            problemsSolved,
+            projectsSubmitted,
+            badgesEarned,
+            jobsApplied,
+            mentorBookings,
+            nextSession
         });
 
     } catch (error) {

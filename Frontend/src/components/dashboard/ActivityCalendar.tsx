@@ -40,9 +40,14 @@ export function ActivityCalendar({ className, userId }: { className?: string; us
             const res = await api.get(endpoint);
             // Convert array to map for easy lookup
             const dataMap: Record<string, CalendarDay> = {};
-            res.data.forEach((day: CalendarDay) => {
-                dataMap[day.date] = day;
-            });
+            // Safety check: Ensure res.data is an array before iterating
+            if (Array.isArray(res.data)) {
+                res.data.forEach((day: CalendarDay) => {
+                    dataMap[day.date] = day;
+                });
+            } else {
+                console.warn("API returned non-array for calendar data:", res.data);
+            }
             setCalendarData(dataMap);
         } catch (e) {
             console.error("Failed to fetch calendar", e);
